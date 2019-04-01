@@ -4,16 +4,18 @@ var fs = require('fs');
 
 // check and create rerun command folder 
 function createFolder(){
+    console.log('Onno_Debug: the createFolder function is called!'); 
     if (!fs.existsSync('./rerun-command')){
+        console.log('Onno_Debug: the folder does not exist!');
         fs.mkdirSync('./rerun-command');
     }
 }
 
 // write the initial command to the file, this file will store all failed tests; 
 function createCommandFile(){
-    if (!fs.existsSync('./rerun-command/rerun_command.txt')){
-        fs.writeFile('./rerun-command/rerun_command.txt', 'protractor protractor.conf.js --cucumberOpts.tags=""');
-    }  
+
+    console.log('Onno_Debug: the createCommandFile function is called!');
+    fs.writeFile('./rerun-command/rerun_command.txt', 'protractor protractor.conf.js --cucumberOpts.tags=""');
 }
 
 // create command to run all the failed tests; 
@@ -53,8 +55,8 @@ function appendTagToCommand(tag){
 
 module.exports = {
 
-    createFolder : createFolder(), 
-    createCommandFile : createCommandFile(),
-    appendTagToCommand : appendTagToCommand(tag)
+    createFolder : createFolder, 
+    createCommandFile : createCommandFile,
+    appendTagToCommand : appendTagToCommand
     
 }

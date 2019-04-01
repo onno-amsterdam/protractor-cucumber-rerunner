@@ -2,6 +2,7 @@
 
 var tag; 
 var tags = []; 
+var rerunCommand = require('./rerun_command.js'); 
 
 function getTagFromScenario(scenario){
     console.log('Onno_Debug: the tag from scenario function is called!'); 
@@ -26,9 +27,10 @@ function getIndexByTag(tag){
     return tags.indexOf(tag); 
 }
 
-function checkIfTagExists(tag){
+function checkIfTagExistsTwice(tag){
     // check if the tag is included in the array, if yes return true, if not return false; 
-    if (tags.includes(tag)) { 
+    if (tags.includes(tag)) {
+        tags.includ 
         console.log('Onno_Debug: the tag exists in the array');   
         return true 
     } else {
@@ -54,8 +56,10 @@ module.exports = {
         // get the first name of the tag in the array of tags for the scenario
         tag = getTagFromScenario(scenario);
 
-        // check if tag is already in array - if not add 
-        if (!checkIfTagExists()) {
+        // check if tag is already in array - if not add (WRONG!)
+        // above line is wrong - the tag should always be added. If it passes it should be removed - not with splice but the last;
+        // if it fails the check needs to be done - if the tag is in the array twice or more if yes - remove it; 
+        if (!checkIfTagExists(tag)) {
             console.log('Onno_Debug: the tag ' + tag + ' did not exist in the array - so adding!'); 
             tags.push(tag);
         } 
@@ -64,7 +68,7 @@ module.exports = {
 
     // function removes the tag, should be called only when scenario is passed; 
     removePassedTag : function(scenario) {
-        var tag = getTagFromScenario(scenario); 
+        tag = getTagFromScenario(scenario); 
         console.log('Onno_Debug: the remove tag function is called for tag ' + tag); 
         removeTag(getIndexByTag(tag)); 
     }, 
@@ -80,15 +84,18 @@ module.exports = {
 
     createCommand : function() {
         
-        var rerunCommand = require('./rerun_command.js'); 
-
         // if the tags array is not larger than 0 the initial command needs to be created 
-        if(!tags.length > 0) {
+        if(tags.length === 1) {
             console.log('Onno_Debug: FIRST tag - the array DOES NOT have more than one tag'); 
             rerunCommand.createFolder(); 
             rerunCommand.createCommandFile(); 
+        } else {
+            console.log('Onno_Debug: NOT the first tag - the array has MORE than one tag'); 
         }
 
-        rerunCommand.appendTagToCommand(tag); 
+        if (!checkIfTagExists(tag)) {
+            console.log('Onno_Debug: the tag passed to the appendTagToCommand function: ' + tags[tag]); 
+            rerunCommand.appendTagToCommand(tags[tag]);
+        }
     }
 }

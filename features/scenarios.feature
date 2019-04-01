@@ -15,3 +15,7 @@ Feature: Poc for the rerun-protractor-cucumber project
         Given I open the page
         Then I check the elements text "title"
    
+   @scenario-one
+    Scenario: Scenario name
+        Given I open the page
+        Then I check the elements text "title"
