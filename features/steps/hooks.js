@@ -15,12 +15,19 @@ module.exports = function() {
 
   // Asynchronous Promise
   this.After(function (scenario, callback) {
-    // Assuming this.driver is a selenium webdriver
+    
     console.log("Onno_Debug: the After is called!"); 
-    if(scenario.isPassed){
+    
+    // if the scenario is not failed, remove it from the array; 
+    if(scenario.isFailed()){
+      console.log("Onno_Debug: the scenario is FAILED!"); 
+      rerun.logAllFailed(); 
+      rerun.createCommand(); 
+    } else {
+      console.log("Onno_Debug: the scenario is PASSED!");
       rerun.removePassedTag(scenario); 
-    };
-    rerun.logAllFailed(); 
+      rerun.logAllFailed(); 
+    }    
     callback();
   });
 };
