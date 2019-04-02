@@ -21,28 +21,33 @@ function createCommandFile(){
 // create command to run all the failed tests; 
 function appendTagToCommand(tag){
 
+    console.log('Onno_Debug: the appendTagCommand is called for tag: ' + tag);  
+
     fs.readFile('./rerun-command/rerun_command.txt',"utf8", (err, data) => {
                     
         // initiate variable for the command
         if (err) throw err;
         
         // remove the last quotation mark from the string
-        var intitalCommand = data.substring(0, data.length - 1);
+        var initialCommand = data.substring(0, data.length - 1);
+
+        console.log('Onno_Debug: the initialCommand read from the rerun_command.txt: ' + initialCommand);  
         
         // check if there already is a tag in the protractor command
-        if (intitalCommand.indexOf('@') > -1) {
+        if (initialCommand.indexOf('@') > -1) {
         
             // if no tag append the command with comma
             console.log('Onno: the next failed tag is logged!');
-            newCommand = intitalCommand + ', ' + tag + '"'; 
+            newCommand = initialCommand + ', ' + tag + '"'; 
             console.log("Onno_Debug: the new command is: " + newCommand); 
         } else {
         
             // if no tag append the command without comma
             console.log('Onno: the first failed tag is logged!');
-            newCommand = intitalCommand + tag + '"'; 
+            newCommand = initialCommand + tag + '"'; 
             console.log("The new command is: " + newCommand); 
         }   
+
         if (fs.existsSync('./rerun-command/rerun_command.txt')){
             fs.writeFileSync('./rerun-command/rerun_command.txt', newCommand, 'utf8');
         }  else {

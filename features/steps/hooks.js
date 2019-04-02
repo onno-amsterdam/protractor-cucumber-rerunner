@@ -21,12 +21,10 @@ module.exports = function() {
     // if the scenario is not failed, remove it from the array; 
     if(scenario.isFailed()){
       console.log("Onno_Debug: the scenario is FAILED!"); 
-      rerun.logAllFailed(); 
       rerun.createCommand(); 
     } else {
       console.log("Onno_Debug: the scenario is PASSED!");
-      rerun.removePassedTag(scenario); 
-      rerun.logAllFailed(); 
+      rerun.removePassedTag(); 
     }    
     callback();
   });

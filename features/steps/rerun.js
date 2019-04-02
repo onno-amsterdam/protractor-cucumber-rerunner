@@ -18,9 +18,22 @@ function getTagByIndex(index){
     return tag; 
 }
 
-function removeTag(index){
-    console.log('Onno_Debug: the remove tag function is called'); 
-    tags.splice(index); 
+function addTagToArray(tag){
+    console.log('Onno_Debug: the addTagToArray function is called!'); 
+    tags.push(tag);
+    console.log('Onno_Debug: the length of the tags array after adding = ' + tags.length); 
+}
+
+function removeLastTag(){
+    console.log('Onno_Debug: the removeLastTag function is called!'); 
+    tags.pop(); 
+    console.log('Onno_Debug: the length of the tags array after the pop = ' + tags.length); 
+}
+
+function removePassedTag() {
+    console.log('Onno_Debug: the removePassedTag function is called!'); 
+    console.log('Onno_Debug: the length of the tags array = ' + tags.length); 
+    removeLastTag(); 
 }
 
 function getIndexByTag(tag){
@@ -28,13 +41,18 @@ function getIndexByTag(tag){
 }
 
 function checkIfTagExistsTwice(tag){
-    // check if the tag is included in the array, if yes return true, if not return false; 
+    // check if the tag is included in the array, if yes return true, if not return false;
+    // remove the tag from the end of the array;
+    removeLastTag(tag); 
+    // check if the tag exists in the array;
     if (tags.includes(tag)) {
-        tags.includ 
+        // if the tag exists don't add it again;
         console.log('Onno_Debug: the tag exists in the array');   
         return true 
     } else {
+        // if the tag doesn't exist add it back to the array; 
         console.log('Onno_Debug: the tag DOES NOT exist in the array');
+        addTagToArray(tag); 
         return false;
     }
 }
@@ -59,26 +77,19 @@ module.exports = {
         // check if tag is already in array - if not add (WRONG!)
         // above line is wrong - the tag should always be added. If it passes it should be removed - not with splice but the last;
         // if it fails the check needs to be done - if the tag is in the array twice or more if yes - remove it; 
-        if (!checkIfTagExists(tag)) {
-            console.log('Onno_Debug: the tag ' + tag + ' did not exist in the array - so adding!'); 
-            tags.push(tag);
-        } 
+        console.log('Onno_Debug: the tag ' + tag + ' did not exist in the array - so adding!'); 
+        addTagToArray(tag);
         console.log("Onno_Debug: tag added to array: " + tags[tags.length - 1]); 
     },
 
     // function removes the tag, should be called only when scenario is passed; 
-    removePassedTag : function(scenario) {
-        tag = getTagFromScenario(scenario); 
-        console.log('Onno_Debug: the remove tag function is called for tag ' + tag); 
-        removeTag(getIndexByTag(tag)); 
-    }, 
-
+    removePassedTag : removePassedTag, 
 
     logAllFailed : function(){
         console.log('Onno_Debug: the log all failed function is called!'); 
         console.log('Onno_Debug: the length of the array = ' + tags.length); 
-        for (tag in tags){
-            console.log('Onno_Debug: the tag ' + tag + ' array of tags: ' + tags[tag]); 
+        for (scenTag in tags){
+            console.log('Onno_Debug: the tag ' + scenTag + ' array of tags: ' + tags[scenTag]); 
         }
     }, 
 
@@ -93,9 +104,9 @@ module.exports = {
             console.log('Onno_Debug: NOT the first tag - the array has MORE than one tag'); 
         }
 
-        if (!checkIfTagExists(tag)) {
-            console.log('Onno_Debug: the tag passed to the appendTagToCommand function: ' + tags[tag]); 
-            rerunCommand.appendTagToCommand(tags[tag]);
+        if (!checkIfTagExistsTwice(tag)) {
+            console.log('Onno_Debug: the tag passed to the appendTagToCommand function: ' + tag); 
+            rerunCommand.appendTagToCommand(tag);
         }
     }
 }
