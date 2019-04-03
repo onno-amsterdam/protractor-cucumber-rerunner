@@ -8,8 +8,9 @@ Other solutions strucle with timeout issues - especially cucumber steps timing o
 All the cucumber scenarios need to have a tag. A scenario can have multiple tags but the first will be used to rerun the scenario if it has failed. Preferably this first scenario is unique although it doesn't have to be. If a scenario fails with a tag that is not unique the rerun program will execute all scenarios with this tag even if the scenarion did not fail. 
 
 ## scenarios in this example
-* test one with tag @scenario-one fails & has unique tag: tag is in rerun command; 
-* test two with tag @scenario-two passes & has unique tag: tag is NOT in rerun command; 
-* test three with tag @scenario-three fails & has unique tag: tag is in rerun command; 
-* test four with tag @scenario-one passes has & same tag as test one: tag is NOT added to rerun command;
-* test five with tag @scenario-one fails has & same tag as test one: tag is NOT added to rerun command; 
+* 1) scenario passes before any failures: rerun command is NOT created; 
+* 2) first scenario fails in the test run: rerun command is created and tag is added; 
+* 3) scenario passes after earlier failure(s) in test run: tag is NOT added to existing rerun command; 
+* 4) scenario with - unique tag - fails after first failure: tag is added to the existing rerun command;    
+* 5) scenario with - same tag as scenario that failed earlier - fails: tag is NOT added to the existing rerun command; 
+* 6) scenario with - same tag as scenario that passed earlier - fails: tag is added to the existing rerun command; 
