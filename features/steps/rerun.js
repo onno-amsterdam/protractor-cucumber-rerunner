@@ -2,7 +2,26 @@
 
 var tag; 
 var tags = []; 
+var rerunCommandFilePath = ('./rerun-command/rerun_command.txt');
 var rerunCommand = require('./rerun_command.js'); 
+var fs = require('fs'); 
+
+function checkIfRerunCommandExists(){
+    try {
+        if (fs.existsSync(rerunCommandFilePath)) {
+          return true; 
+        }
+      } catch(err) {
+          return false; 
+      }
+}
+
+function removeRerunCommand(){
+    if(checkIfRerunCommandExists()){
+        fs.unlink(rerunCommandFilePath);
+        fs.rmdir('./rerun-command'); 
+    }
+}
 
 function getTagFromScenario(scenario){
     tag = scenario.getTags()[0].getName();
@@ -13,10 +32,14 @@ function addTagToArray(tag){
     tags.push(tag);
 }
 /**
- * 
+ * Adds the tag of the scenario to the tags array. This function is called before the scenario is run. 
+ * If the 
  * @param {scenario} scenario 
  */
 function addScenarioTag(scenario){
+    if ( tags.length === 0) {
+        removeRerunCommand(); 
+    }
     addTagToArray(getTagFromScenario(scenario));
 }
 /**
