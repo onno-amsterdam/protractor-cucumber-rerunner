@@ -76,15 +76,11 @@ function checkIfTagExistsTwice(tag){
 function createCommand(){
     
     if(tags.length === 1) {
-        console.log('Onno_Debug: FIRST tag - the array DOES NOT have more than one tag'); 
         rerunCommand.createFolder(); 
         rerunCommand.createCommandFile(); 
-    } else {
-        console.log('Onno_Debug: NOT the first tag - the array has MORE than one tag'); 
     }
 
     if (!checkIfTagExistsTwice(tag)) {
-        console.log('Onno_Debug: the tag passed to the appendTagToCommand function: ' + tag); 
         rerunCommand.appendTagToCommand(tag);
     }
 }

@@ -4,17 +4,9 @@ exports.config = {
   
     // Capabilities to be passed to the webdriver instance.
     capabilities: {
-     // 'browserName': 'internet explorer', - special installation needed
-     // 'version':'10',
-     'browserName': 'chrome',
-     //'browserName': 'firefox'
+      'browserName': 'chrome'
     },
-    // Base URL can be used when test run on specific host and/or port 
-    // baseUrl:'http://127.0.0.1:8080',
-    // Spec patterns are relative to the current working directly when
-    // protractor is called.
-    // specs: ['test/protractor/protractor.js'],
-  
+
     // spec location for the cucumber tests
     specs: ['features/*.feature'],
 
@@ -29,7 +21,7 @@ exports.config = {
   
     cucumberOpts: {
       require: [
-        'features/steps/*_steps.js',
+        'features/steps/step_defs.js',
         'features/steps/hooks.js',
       ],
       format: 'pretty'
