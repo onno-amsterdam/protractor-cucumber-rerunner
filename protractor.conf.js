@@ -8,7 +8,7 @@ exports.config = {
     },
 
     // spec location for the cucumber tests
-    specs: ['features/*.feature'],
+    specs: ['features/scenarios.feature'],
 
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
