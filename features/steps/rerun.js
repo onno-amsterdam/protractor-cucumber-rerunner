@@ -1,181 +1,151 @@
-// rerun module holds all functions to rerun the tests
-
-let tag;
-const tags = [];
-const rerunCommandFilePath = ('./rerun-command/rerun_command.txt');
-const failedTagsFilePath = ('./rerun-command/failed_tags.txt');
 const fs = require('fs');
 
-// module that creates the rerun command and saves it in a file
+const RERUN_COMMAND_FOLDER_PATH = './rerun-command';
+const RERUN_COMMAND_FILE_PATH = `${RERUN_COMMAND_FOLDER_PATH}/rerun_command.txt`;
+const FAILED_TAGS_FILE_PATH = `${RERUN_COMMAND_FOLDER_PATH}/failed_tags.txt`;
 
-// check and create rerun command folder 
-function createFolder() {
-    if (!fs.existsSync('./rerun-command')) {
-        fs.mkdirSync('./rerun-command');
-    }
-}
-
-// write the initial command to the file, this file will store all failed tests; 
-function createCommandFile() {
-    fs.writeFileSync('./rerun-command/rerun_command.txt', 'protractor protractor.conf.js --cucumberOpts.tags=""');
-}
-
-// write the initial file that holds all the tags of the failed scenarios; 
-function createFailedTagsFile() {
-    fs.writeFileSync('./rerun-command/failed_tags.txt', '');
-}
-
-// create both files 
-function createRerunFiles() {
-    createFailedTagsFile();
-    createCommandFile();
-}
-
-// create command to run all the failed tests; 
-function appendTagToCommand(tag) {
-    fs.readFile('./rerun-command/rerun_command.txt',"utf8", (err, data) => {
-                    
-        // initiate variable for the command
-        if (err) throw err;
-
-        // remove the last quotation mark from the string
-        var initialCommand = data.substring(0, data.length - 1);
-
-        // check if there already is a tag in the protractor command
-        if (initialCommand.indexOf('@') > -1) {
-
-            // if tag append the command with comma
-           newCommand = initialCommand + ', ' + tag + '"';
-        } else {
-            // if no tag append the command without comma
-            newCommand = initialCommand + tag + '"';
-        }
-
-        if (fs.existsSync('./rerun-command/rerun_command.txt')){
-            fs.writeFileSync('./rerun-command/rerun_command.txt', newCommand, 'utf8');
-        }  else {
-            createCommandFile();
-            fs.writeFileSync('./rerun-command/rerun_command.txt', newCommand, 'utf8');
-        }
-    });
-}
-
-// create string with all the tags of the failed scenarios;
-function appendTagToFailedTagsFile(tag) {
-    fs.readFile('./rerun-command/failed_tags.txt',"utf8", (err, data) => {
-
-        // initiate variable for the command
-        if (err) throw err;
-
-        // remove the last quotation mark from the string
-        var initialTags = data.substring(0, data.length);
-
-        // check if there already is a tag in the protractor command
-        if (initialTags.indexOf('@') > -1) {
-           // if tag append with comma
-           tagsList = initialTags + ', ' + tag;
-        } else {
-           // if no tag append the command without comma
-           tagsList = initialTags + tag;
-        }
-
-        if (fs.existsSync('./rerun-command/failed_tags.txt')){
-            fs.writeFileSync('./rerun-command/failed_tags.txt', tagsList, 'utf8');
-        }  else {
-            createFailedTagsFile();
-            fs.writeFileSync('./rerun-command/failed_tags.txt', tagsList, 'utf8');
-        } 
-    });
-}
-
-function appendTagToFiles(tag){
-    appendTagToCommand(tag);
-    appendTagToFailedTagsFile(tag);
-}
-
-function checkIfRerunCommandExists(){
-    try {
-        if (fs.existsSync(rerunCommandFilePath)) {
-          return true;
-        }
-      } catch(err) {
-          return false;
-      }
-}
-
-function removeRerunCommand(){
-    if(checkIfRerunCommandExists()){
-        fs.unlinkSync(rerunCommandFilePath);
-        fs.unlinkSync(failedTagsFilePath);
-        fs.rmdirSync('./rerun-command');
-    }
-}
-
-function getTagFromScenario(scenario){
-    tag = scenario.getTags()[0].getName();
-    return tag;
-}
-
-function addTagToArray(tag){
-    tags.push(tag);
-}
+const scenarioTags = new Map();
 
 /**
- * The removeLastTag function removes the last tag of the tags array. This function is called when a tag is passed through the removePassedTag function or when the checkIfTagExistsTwice is called. 
- */
-function removeLastTag(){
-    tags.pop();
-}
-
-/**
- * The function checkIfTagExistsTwice makes sure a tag that's already present in the array is not added again. Preferably the first tags in the cucumber scenarios are unique, however if they are not the tag should not be added twice. 
- * @param {var} tag
- */
-function checkIfTagExistsTwice(tag) {
-    removeLastTag(tag);
-    if (tags.includes(tag)) {
-        return true
-    } else {
-        addTagToArray(tag);
-        return false;
-    }
-}
-
-/**
- * Adds the tag of the scenario to the tags array. This function is called before the scenario is run. 
- * If the 
+ * Get scenario's first tag name
  * @param {scenario} scenario 
  */
-function addScenarioTag(scenario) {
-    if ( tags.length === 0) {
+function getScenarioTag(scenario) {
+  return scenario.getTags()[0].getName();
+}
+
+/**
+ * Create rerun command folder if non existing
+ */
+function createRerunCommandFolder() {
+    console.log("Creating the folder!"); 
+    if (!fs.existsSync(RERUN_COMMAND_FOLDER_PATH)) { 
+    return fs.mkdirSync(RERUN_COMMAND_FOLDER_PATH);
+  }
+}
+
+/**
+ * Write the initial command to the file, this file will store all failed tests.
+ * The command will set the host and port, so the test runs against the correct environment.
+ * If used in host and port are used in the protractor.conf file add this to the command:
+ * 
+ * --params.target.host="${browser.params.target.host}" \
+ * --params.target.port="${browser.params.target.port}" \
+ *  
+ */
+function createCommandFile() {
+  const command = `protractor protractor.conf.js \
+  --ignoreUncaughtExceptions \
+  --cucumberOpts.tags=""`;
+  return fs.writeFileSync(RERUN_COMMAND_FILE_PATH, command, 'utf8');
+}
+
+/**
+ * Write the initial file that holds all the tags of the failed scenarios;
+ */
+function createFailedTagsFile() {
+  return fs.writeFileSync(FAILED_TAGS_FILE_PATH, '', 'utf8');
+}
+
+/**
+ * Append new tag to the rerun command file
+ * @param {string} newTag 
+ */
+function appendTagToCommand(newTag) {
+  const command = fs.readFileSync(RERUN_COMMAND_FILE_PATH, 'utf8');
+
+  const newCommand = command.replace(/--cucumberOpts\.tags="([^"]*)/, (match, tags) => {
+    // if there are existing tags add comma to match to append new tag
+    if (tags) {
+      match += ', ';
+    }
+    return match + newTag; 
+  });
+
+  fs.writeFileSync(RERUN_COMMAND_FILE_PATH, newCommand, 'utf8');
+}
+
+/**
+ * Append new scenario tag to the failed tags file
+ * @param {string} newTag 
+ */
+function appendTagToFailedTagsFile(newTag) {
+  let tags = fs.readFileSync(FAILED_TAGS_FILE_PATH, 'utf8');
+    
+  if (tags) {
+    tags += ', ';
+  }
+  tags += newTag;
+  fs.writeFileSync(FAILED_TAGS_FILE_PATH, tags, 'utf8');
+}
+
+/**
+ * Remove rerun command from file system
+ */
+function removeRerunCommand() {
+  try {
+    if (fs.existsSync(RERUN_COMMAND_FILE_PATH)) {
+      fs.unlinkSync(RERUN_COMMAND_FILE_PATH);
+      fs.unlinkSync(FAILED_TAGS_FILE_PATH);
+      fs.rmdirSync(RERUN_COMMAND_FOLDER_PATH);
+    }
+  } catch(err) {}
+}
+
+/**
+ * Remove scenario from storage after running it successfully.
+ * @param {scenario} scenario
+ */
+function removeScenario(scenario) {
+  const scenarioTag = getScenarioTag(scenario);
+
+  if (scenarioTags.has(scenarioTag)) {
+    const scenarioTagCount = scenarioTags.get(scenarioTag);
+    if (scenarioTagCount === 1) {
+      scenarioTags.delete(scenarioTag);
+    } else {
+      scenarioTags.set(scenarioTag, scenarioTagCount - 1)
+    }
+  }
+}
+
+/**
+ * Store scenario before running it. Cleans up previous rerun command for first storage.
+ * @param {scenario} scenario
+ */
+function addScenario(scenario) {
+    if (scenarioTags.size === 0) {
         removeRerunCommand();
     }
-    addTagToArray(getTagFromScenario(scenario));
+  const scenarioTag = getScenarioTag(scenario);
+  if (scenarioTags.has(scenarioTag)) {
+    const scenarioTagCount = scenarioTags.get(scenarioTag);
+    scenarioTags.set(getScenarioTag(scenario), scenarioTagCount + 1);
+  } else {
+    scenarioTags.set(getScenarioTag(scenario), 1);
+  }  
 }
 
 /**
- * The removePassedTag function calls the removeLastTag function to remove the last tag from the array. 
+ * For first failed scenario create base rerun command and failed tags file
+ * Appends scnario tag to both files when it is the first failing occurance of the scenario tag
+ * @param {scenario} scenario
  */
-function removePassedTag() {
-    removeLastTag();
-}
-
-/**
- * The function createCommand uses the rerun_command module to create a folder and text file that holds the protractor command that runs all the failed test. If the function is called when the tags array holds only one tag the folder and file are created - any existing will be overwritten. Before the tag is added a check is done if the tag is already in the array. If it is, the tag is not added to the rerun-command. 
- */
-function createCommand(){
-    if(tags.length === 1) {
-        createFolder();
-        createRerunFiles();
+function createRerunCommand(scenario) {
+    if (!fs.existsSync(RERUN_COMMAND_FILE_PATH)) {
+      createRerunCommandFolder();
+      createCommandFile();
+      createFailedTagsFile();
     }
-
-    if (!checkIfTagExistsTwice(tag)) {
-        appendTagToFiles(tag);
-    }
+  const scenarioTag = getScenarioTag(scenario);
+  if (scenarioTags.has(scenarioTag) && scenarioTags.get(scenarioTag) === 1) {
+    appendTagToCommand(scenarioTag);
+    appendTagToFailedTagsFile(scenarioTag);
+  }
 }
 
 module.exports = {
-    addScenarioTag : addScenarioTag,
-    removePassedTag : removePassedTag,
-    createCommand : createCommand
-}
+  addScenario,
+  removeScenario,
+  createRerunCommand,
+};
