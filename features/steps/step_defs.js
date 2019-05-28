@@ -19,4 +19,21 @@ module.exports = function() {
             .then((text) => expect(text).to.equal(expectedText))
             .then(() => callback())
     });
+
+    this.Given(/^I check the random number is selected$/, function (callback) {
+        let promise = new Promise(resolve, reject => {
+            let randNum = Math.floor(Math.random() * (3 - 1)) + 1;
+            console.log("Random number created: " + randNum); 
+            resolve(randNum);
+        });
+
+        promise
+        .then((randomNumber) => expect(randomNumber).to.equal(2))
+        .then(() => callback())
+        .catch(error => {
+            console.log("Failed!");
+            callback(error);
+        }); 
+        
+    });
 }; 

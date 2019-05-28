@@ -11,11 +11,14 @@ module.exports = function() {
   }); 
 
   this.After(function (scenario, callback) {
+    // synchronisity needs to be added because else it possible the file does not exist when the tag is added; 
     if(scenario.isFailed()){
       rerun.createCommand(); 
+      callback(); 
     } else {
+      // needs to be synchronised because otherwise the tag added by the Before might be removed by the After;  
       rerun.removePassedTag(); 
+      callback(); 
     }    
-    callback();
   });
 };
