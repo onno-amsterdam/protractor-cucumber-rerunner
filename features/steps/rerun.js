@@ -29,9 +29,7 @@ function createRerunCommandFolder() {
  * The command will set the host and port, so the test runs against the correct environment.
  * If used in host and port are used in the protractor.conf file add this to the command:
  * 
- * --params.target.host="${browser.params.target.host}" \
- * --params.target.port="${browser.params.target.port}" \
- *  
+ * All parameters that are needed to run the Protractor tests can be added here. *  
  */
 function createCommandFile() {
   const command = `protractor protractor.conf.js \

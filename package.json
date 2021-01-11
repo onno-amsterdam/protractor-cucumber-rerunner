@@ -9,6 +9,9 @@
     "scripts": {
         "prestart-webdriver": "webdriver-manager update",
         "start-webdriver": "webdriver-manager start",
-        "protractor": "protractor protractor.conf.js --ignoreUncaughtExceptions"
+        "protractor": "protractor protractor.conf.js --ignoreUncaughtExceptions",
+        "test": "bash cicd_scripts/run_tests.sh",
+        "test:rerun": "bash cicd_scripts/runAndRerunTests.sh",
+        "rerun": "bash cicd_scripts/rerun_failed_tests.sh"
     }
 }
